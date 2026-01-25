@@ -15,14 +15,14 @@ const TreeVisualizer: React.FC<TreeVisualizerProps> = ({ members, onSelectMember
 
   useEffect(() => {
     const updateDimensions = () => {
-        if (containerRef.current) {
-            setDimensions({
-                width: containerRef.current.clientWidth,
-                height: containerRef.current.clientHeight
-            });
-        }
+      if (containerRef.current) {
+        setDimensions({
+          width: containerRef.current.clientWidth,
+          height: containerRef.current.clientHeight
+        });
+      }
     };
-    
+
     window.addEventListener('resize', updateDimensions);
     updateDimensions();
     return () => window.removeEventListener('resize', updateDimensions);
@@ -49,11 +49,11 @@ const TreeVisualizer: React.FC<TreeVisualizerProps> = ({ members, onSelectMember
       console.error("Invalid tree structure:", e);
       // Fallback for empty or broken tree
       svg.append("text")
-         .attr("x", width / 2)
-         .attr("y", height / 2)
-         .attr("text-anchor", "middle")
-         .attr("fill", "#ef4444")
-         .text("Invalid Tree Structure. Ensure only one root exists.");
+        .attr("x", width / 2)
+        .attr("y", height / 2)
+        .attr("text-anchor", "middle")
+        .attr("fill", "#ef4444")
+        .text("Invalid Tree Structure. Ensure only one root exists.");
       return;
     }
 
@@ -88,9 +88,9 @@ const TreeVisualizer: React.FC<TreeVisualizerProps> = ({ members, onSelectMember
       .attr("fill", "none")
       .attr("stroke", "#d1d5db") // Light gray for subtle links
       .attr("stroke-width", 2)
-      .attr("d", d3.linkVertical()
-        .x((d: any) => d.x)
-        .y((d: any) => d.y) as any
+      .attr("d", d3.linkVertical<d3.HierarchyPointNode<FamilyMember>, d3.HierarchyPointNode<FamilyMember>>()
+        .x(d => d.x)
+        .y(d => d.y)
       );
 
     // Nodes
@@ -98,7 +98,7 @@ const TreeVisualizer: React.FC<TreeVisualizerProps> = ({ members, onSelectMember
       .data(treeData.descendants())
       .enter().append("g")
       .attr("class", d => `node ${d.data.id === selectedId ? "selected" : ""}`)
-      .attr("transform", (d: any) => `translate(${d.x},${d.y})`)
+      .attr("transform", d => `translate(${d.x},${d.y})`)
       .on("click", (event, d) => {
         event.stopPropagation();
         onSelectMember(d.data.id);
@@ -126,15 +126,15 @@ const TreeVisualizer: React.FC<TreeVisualizerProps> = ({ members, onSelectMember
       .attr("fill", d => d.data.gender === 'female' ? "#fee2e2" : "#f3f4f6") // Red-100 or Gray-100
       .attr("stroke", d => d.data.id === selectedId ? "#dc2626" : "white")
       .attr("stroke-width", 2);
-    
+
     // Gender Icon
     node.append("text")
-        .attr("x", 0)
-        .attr("y", -48)
-        .attr("text-anchor", "middle")
-        .attr("font-size", "14px")
-        .attr("fill", "#374151")
-        .text(d => d.data.gender === 'female' ? "♀" : "♂");
+      .attr("x", 0)
+      .attr("y", -48)
+      .attr("text-anchor", "middle")
+      .attr("font-size", "14px")
+      .attr("fill", "#374151")
+      .text(d => d.data.gender === 'female' ? "♀" : "♂");
 
     // Name
     node.append("text")
@@ -145,16 +145,16 @@ const TreeVisualizer: React.FC<TreeVisualizerProps> = ({ members, onSelectMember
       .attr("font-size", "16px") // Larger font
       .attr("fill", "#111827") // Darker black for readability
       .text(d => d.data.name)
-      .each(function(d) {
-          // Truncate if too long
-          const self = d3.select(this);
-          let textLength = self.node()?.getComputedTextLength() || 0;
-          let text = d.data.name;
-          while (textLength > 200 && text.length > 0) {
-              text = text.slice(0, -1);
-              self.text(text + "...");
-              textLength = self.node()?.getComputedTextLength() || 0;
-          }
+      .each(function (d) {
+        // Truncate if too long
+        const self = d3.select(this);
+        let textLength = self.node()?.getComputedTextLength() || 0;
+        let text = d.data.name;
+        while (textLength > 200 && text.length > 0) {
+          text = text.slice(0, -1);
+          self.text(text + "...");
+          textLength = self.node()?.getComputedTextLength() || 0;
+        }
       });
 
     // Regional Name
@@ -169,27 +169,27 @@ const TreeVisualizer: React.FC<TreeVisualizerProps> = ({ members, onSelectMember
       .text(d => d.data.regionalName || "");
 
     // Spouse Info
-    node.each(function(d) {
-        if (d.data.spouseName) {
-            d3.select(this).append("text")
-                .attr("dy", "32")
-                .attr("x", 0)
-                .attr("text-anchor", "middle")
-                .attr("font-size", "13px")
-                .attr("fill", "#4b5563")
-                .text(`❤️ ${d.data.spouseName}`);
-            
-            if (d.data.spouseRegionalName) {
-                d3.select(this).append("text")
-                    .attr("dy", "48")
-                    .attr("x", 0)
-                    .attr("text-anchor", "middle")
-                    .attr("class", "lang-script")
-                    .attr("font-size", "13px")
-                    .attr("fill", "#ef4444") // Lighter red for spouse regional
-                    .text(d.data.spouseRegionalName);
-            }
+    node.each(function (d) {
+      if (d.data.spouseName) {
+        d3.select(this).append("text")
+          .attr("dy", "32")
+          .attr("x", 0)
+          .attr("text-anchor", "middle")
+          .attr("font-size", "13px")
+          .attr("fill", "#4b5563")
+          .text(`❤️ ${d.data.spouseName}`);
+
+        if (d.data.spouseRegionalName) {
+          d3.select(this).append("text")
+            .attr("dy", "48")
+            .attr("x", 0)
+            .attr("text-anchor", "middle")
+            .attr("class", "lang-script")
+            .attr("font-size", "13px")
+            .attr("fill", "#ef4444") // Lighter red for spouse regional
+            .text(d.data.spouseRegionalName);
         }
+      }
     });
 
   }, [members, dimensions, selectedId, onSelectMember]);
